@@ -1,0 +1,191 @@
+* {
+padding: 0;
+margin: 0;
+box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #e0f7ef; /* Light green background */
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px; /* Reduced padding */
+  background-color: #2ecc71; /* Green color */
+  color: #ecf0f1;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+header img {
+  max-height: 40px;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+}
+
+nav a {
+  color: #ecf0f1;
+  margin-left: 20px;
+  text-decoration: none;
+  padding: 8px 10px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+nav a:hover {
+  background-color: #27ae60; /* Darker green on hover */
+}
+
+.main-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #2ecc71, #27ae60); /* Green gradient background */
+  color: #ecf0f1;
+  text-align: center;
+}
+
+.introduction,
+.image-container {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
+}
+
+.introduction h2 {
+  color: #ecf0f1;
+}
+
+.image-container img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.testimonials {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #ecf0f1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  display: flex; /* Display testimonials horizontally */
+  justify-content: space-around; /* Add space between testimonials */
+  flex-wrap: wrap; /* Allow testimonials to wrap on smaller screens */
+}
+
+.testimonial {
+  width: calc(33.33% - 20px); /* Adjust width for three testimonials */
+  margin-bottom: 20px;
+  padding: 20px;
+  background-color: #ecf0f1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.faqs {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #ecf0f1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.faqs .faq {
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 20px;
+  background-color: #ecf0f1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+/* ... Your existing styles ... */
+
+.signup-form {
+  display: block;
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #ecf0f1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-top: 50px;
+}
+.login-form {
+  display: block;
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #ecf0f1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-top: 50px;
+}
+.login-form h2 {
+  color: #2ecc71; /* Green color for form headings */
+}
+
+.login-form label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+}
+
+.login-form button {
+  background-color: #2ecc71; /* Green color for buttons */
+  color: #ecf0f1;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.login-form button:hover {
+  background-color: #27ae60; /* Darker green on hover */
+}
+
+.login-form p {
+  margin-top: 10px;
+}
+
+/* ... Your existing styles ... */
+
+footer {
+  padding: 20px;
+  background-color: #2ecc71; /* Green color for the footer */
+  color: #ecf0f1;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+}
+
+footer p {
+  margin: 0;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .testimonial {
+    width: 100%; /* Display testimonials in a single column on smaller screens */
+  }
+}
+

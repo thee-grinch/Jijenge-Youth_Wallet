@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>Login Page</title>
+</head>
+<body>
+
+  <header>
+    <img src="logo.png" alt="Logo">
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">About</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </header>
+
+  <div id="loginForm" class="login-form">
+    <h2>Login</h2>
+    <form action="/login" method="post">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="#" id="signupLink">Sign Up</a></p>
+  </div>
+
+  <div id="signupForm" class="login-form">
+    <h2>Sign Up</h2>
+    <form action="https://127.0.0.1:8000/" method="post">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="user_name" required>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <label for="firstname">First Name:</label>
+      <input type="text" id="firstname" name="first_name" required>
+      <label for="lastname">Last Name:</label>
+      <input type="text" id="lastname" name="last_name" required>
+      <button type="submit" >Sign Up</button>
+    </form>
+    <p>Already have an account? <a href="#" id="loginLink">Login</a></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+

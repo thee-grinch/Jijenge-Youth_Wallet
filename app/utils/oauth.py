@@ -7,7 +7,7 @@ from sqlmodel import Session
 
 from sql import models
 from sql import database
-from . import schemas
+from api import schemas
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/login')
 SECRET_KEY = "d009f93e6b8eb75a1057a5a4ab8a092d91b44de7ce42e6a9d388abe1739c3cca"

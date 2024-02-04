@@ -10,6 +10,8 @@ class User(SQLModel, table=True):
     password: Optional[str]
     first_name: str
     last_name: str
+    email: str
+    is_verified: bool = Field(default=False)
     registration_date: Optional[datetime] = Field(default=datetime.now())
     last_login_date : Optional[datetime] = Field(default=datetime.now())
     savings: Optional[List['Saving']] = Relationship(back_populates='user')

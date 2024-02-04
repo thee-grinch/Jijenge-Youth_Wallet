@@ -5,10 +5,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session
 from datetime import datetime
 
-from api.oauth import create_access_token
+from utils.oauth import create_access_token
 from sql.database import create_db_and_tables, engine, get_db
 from sql.models import User, Contribution, Loan, LoanType, Administrator, Saving
-from api.utils import hash_pass, verify_password
+from utils.utils import hash_pass, verify_password
+from utils.user_verification import create_link, decode_token
+from utils.send_mail import send_mail
 from api import schemas
 # from sql.dbfunctions import create_user
 routers = APIRouter(
@@ -54,8 +56,18 @@ def create_user(new_user: User, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     print(new_user.name)
+    link = create_link(new_user.email)
+    send_mail(new_user.email, link, new_user.first_name)
     return {'message': "{} was created successfully".format(new_user.first_name)}
-
+@app.get('/verify')
+def verify_user(token: str, db: Session = Depends(get_db)):
+    email = decode_token(token)
+    user = db.query(User).filter(User.email == email).first()
+    user.is_verified = True
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return {'message': 'email verified successfully'}
 @app.post('/login', response_model=schemas.Token)
 def login(userdetails: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(User).filter(User.user_name == userdetails.username).first()

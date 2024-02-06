@@ -11,13 +11,15 @@ from sql.models import User, Contribution, Loan, LoanType, Administrator, Saving
 from utils.utils import hash_pass, verify_password
 from utils.user_verification import create_link, decode_token
 from utils.send_mail import send_mail
-from api import schemas
+from api import users
+from schemas import schemas
 # from sql.dbfunctions import create_user
-routers = APIRouter(
-    tags=['Authentication']
-)
+# routers = APIRouter(
+#     tags=['Authentication']
+# )
 
 app = FastAPI()
+app.include_router(users.router)
 origins = [
     "http://localhost.tiangolo.com",
     "https://localhost.tiangolo.com",
@@ -37,28 +39,28 @@ app.add_middleware(
 def main():
     create_db_and_tables()
 
-@app.post('/new')
-def create_user(new_user: User, db: Session = Depends(get_db)):
-    """creates a new user to the database"""
-    # setattr(new_user, 'registration_date', datetime.fromisoformat(new_user.registration_date))
-    # setattr(new_user, 'last_login_date', datetime.fromisoformat(new_user.last_login_date))
-    hashed_pass = hash_pass(new_user.password)
-    new_user.password = hashed_pass
-    # with Session(engine) as session:
-    #     session.add(new_user)
-    #     try:
-    #         session.commit()
-    #     except Exception as e:
-    #         return {'new user not created': e}
-    #     session.refresh(new_user)
-    #     return  {'message': "{} was created successfully".format(new_user.first_name)}
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    print(new_user.name)
-    link = create_link(new_user.email)
-    send_mail(new_user.email, link, new_user.first_name)
-    return {'message': "{} was created successfully".format(new_user.first_name)}
+# @app.post('/new')
+# def create_user(new_user: User, db: Session = Depends(get_db)):
+#     """creates a new user to the database"""
+#     # setattr(new_user, 'registration_date', datetime.fromisoformat(new_user.registration_date))
+#     # setattr(new_user, 'last_login_date', datetime.fromisoformat(new_user.last_login_date))
+#     hashed_pass = hash_pass(new_user.password)
+#     new_user.password = hashed_pass
+#     # with Session(engine) as session:
+#     #     session.add(new_user)
+#     #     try:
+#     #         session.commit()
+#     #     except Exception as e:
+#     #         return {'new user not created': e}
+#     #     session.refresh(new_user)
+#     #     return  {'message': "{} was created successfully".format(new_user.first_name)}
+#     db.add(new_user)
+#     db.commit()
+#     db.refresh(new_user)
+#     print(new_user.name)
+#     link = create_link(new_user.email)
+#     send_mail(new_user.email, link, new_user.first_name)
+#     return {'message': "{} was created successfully".format(new_user.first_name)}
 @app.get('/verify')
 def verify_user(token: str, db: Session = Depends(get_db)):
     email = decode_token(token)

@@ -13,7 +13,7 @@ def send_mail(receiver: str, link: str, name: str):
     body = '''
     Dear {},
 
-Thank you for signing up with [Your Company Name]! To complete the registration process and ensure the security of your account, we kindly ask you to verify your email address.
+Thank you for signing up with Jijenge Financial Group! To complete the registration process and ensure the security of your account, we kindly ask you to verify your email address.
 
 Please click on the following link to verify your email:
 {}

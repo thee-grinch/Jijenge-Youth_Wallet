@@ -49,11 +49,11 @@ def verify_user(token: str, db: Session = Depends(get_db)):
 
 @router.post('/login', response_model=Token)
 def login(userdetails: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.user_name == userdetails.username).first()
+    user = db.query(User).filter(User.name == userdetails.username).first()
 
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"The user Does Not Exist")
     if not verify_password(userdetails.password, user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"The passwords do not match")
-    access_token = create_access_token(data={"user_id": user.user_id})
+    access_token = create_access_token(data={"user_id": user.id})
     return {"access_token": access_token, "token_type": "bearer"}

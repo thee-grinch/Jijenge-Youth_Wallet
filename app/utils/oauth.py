@@ -1,6 +1,7 @@
 from datetime import timedelta, datetime
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Header
+from typing import Optional
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError,jwt
 from sqlmodel import Session
@@ -21,6 +22,18 @@ def create_access_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, ALGORITHM)
     return encoded_jwt
 
+def get_token(authorization: Optional[str] = Header(None)):
+    if authorization is None:
+        raise HTTPException(status_code=401, detail="Authorization header missing")
+    
+    # Check if the Authorization header starts with "Bearer " and extract the token
+    prefix = "Bearer "
+    if not authorization.startswith(prefix):
+        raise HTTPException(status_code=401, detail="Invalid Authorization header format")
+    
+    token = authorization[len(prefix):]
+    return token
+
 def verify_token_access(token: str, credentials_exception):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -34,7 +47,7 @@ def verify_token_access(token: str, credentials_exception):
         raise credentials_exception
     return token_data
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(database.get_db)):
+def get_current_user(token: str = Depends(get_token), db: Session = Depends(database.get_db)):
     credendtials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                            detail="Could not validate Credentials",
                                            headers={"WWW-Authenticate": "Bearer"})

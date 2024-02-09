@@ -49,10 +49,13 @@ class Loan(SQLModel, table=True):
     user_id: Optional[int] = Field(default=None, foreign_key='users.id')
     amount: int
     loan_type_id: Optional[int] = Field(default=None, foreign_key='loantypes.loan_type_id')
-    status: str
+    status: Optional[str] = 'pending'
     application_date: Optional[datetime] = Field(default=datetime.utcnow())
+    last_payment_date: datetime or None = None
     payment_schedule: int
-    total_paid: int
+    total_paid: int = 0
+    balance: int = 0
+    total_amount: int = 0
     loan_type: Optional[LoanType] = Relationship(back_populates='loans')
     user: User = Relationship(back_populates='loans')
 class Saving(SQLModel, table=True):

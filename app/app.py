@@ -12,6 +12,7 @@ from sql.database import create_db_and_tables, engine, get_db
 # from utils.user_verification import create_link, decode_token
 # from utils.send_mail import send_mail
 from api import users
+from api import loans
 # from schemas import schemas
 # from sql.dbfunctions import create_user
 # routers = APIRouter(
@@ -20,6 +21,7 @@ from api import users
 
 app = FastAPI()
 app.include_router(users.router)
+app.include_router(loans.router)
 origins = [
     "http://localhost.tiangolo.com",
     "https://localhost.tiangolo.com",

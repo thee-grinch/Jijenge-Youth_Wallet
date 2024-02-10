@@ -75,4 +75,4 @@ class Saving(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     amount = Column(Integer)
     balance = Column(Integer)
-    user = relationship("User", back_populates="savings"
+    user = relationship("User", back_populates="savings")

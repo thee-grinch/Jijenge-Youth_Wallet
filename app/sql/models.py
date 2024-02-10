@@ -55,7 +55,7 @@ class Loan(SQLModel, table=True):
     payment_schedule: int
     total_paid: int = 0
     balance: int = 0
-    total_amount: int = 0
+    total_amount: int or None = None
     loan_type: Optional[LoanType] = Relationship(back_populates='loans')
     user: User = Relationship(back_populates='loans')
 class Saving(SQLModel, table=True):

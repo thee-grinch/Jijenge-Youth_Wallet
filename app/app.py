@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # from datetime import datetime
 
 # from utils.oauth import create_access_token
-from sql.database_alchemy import create_db_and_tables#, engine, get_db
+from sql.database_alchemy import create_db_and_tables, engine, get_db,Base
 # from sql.models import User, Contribution, Loan, LoanType, Administrator, Saving
 # from utils.utils import hash_pass, verify_password
 # from utils.user_verification import create_link, decode_token
@@ -18,7 +18,7 @@ from api import loans
 # routers = APIRouter(
 #     tags=['Authentication']
 # )
-
+Base.metadata.create_all(bind=engine)
 app = FastAPI()
 app.include_router(users.router)
 app.include_router(loans.router)

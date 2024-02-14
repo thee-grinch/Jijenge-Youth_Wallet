@@ -1,20 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import Session
+from sqlalchemy.orm import session
 
-from sql.models import User
-from sql.database import get_db
+from sql.models_alchemy import User
+from sql.database_alchemy import get_db, SessionLocal
 from utils.utils import hash_pass, verify_password
 from utils.user_verification import create_link, decode_token
 from utils.send_mail import send_mail
-from schemas.user import *
+from schemas.user import createUser
 from utils.oauth import create_access_token
 from schemas.schemas import *
 
 router = APIRouter()
 
 @router.post('/new/')
-def create_user(new_user: CreateUser, db: Session = Depends(get_db)):
+def create_user(new_user: createUser , db: session = Depends(get_db)):
     """
         creates a new user to the database
         Parameters:
@@ -39,7 +39,7 @@ def create_user(new_user: CreateUser, db: Session = Depends(get_db)):
     return {'message': "{} was created successfully".format(new_user.first_name)}
 
 @router.get('/verify')
-def verify_user(token: str, db: Session = Depends(get_db)):
+def verify_user(token: str, db: session = Depends(get_db)):
     email = decode_token(token)
     user = db.query(User).filter(User.email == email).first()
     user.is_verified = True
@@ -48,7 +48,7 @@ def verify_user(token: str, db: Session = Depends(get_db)):
     db.refresh(user)
 
 @router.post('/login', response_model=Token)
-def login(userdetails: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(userdetails: OAuth2PasswordRequestForm = Depends(), db: session = Depends(get_db)):
     user = db.query(User).filter(User.name == userdetails.username).first()
 
     if not user:

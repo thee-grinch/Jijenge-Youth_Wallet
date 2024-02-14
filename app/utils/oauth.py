@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime
+import time
 
 from fastapi import Depends, HTTPException, status, Header
 from typing import Optional
@@ -17,12 +18,14 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire.strftime("%Y-%m-%d %H:%M:%S")})
+    expire_timestamp = int(time.time()) + (ACCESS_TOKEN_EXPIRE_MINUTES * 60)  # Convert minutes to seconds
+    to_encode.update({"exp": expire_timestamp})
+    # expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    # to_encode.update({"exp": int(time.mktime(expire.timetuple()))})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, ALGORITHM)
     return encoded_jwt
 
-def get_token(authorization: Optional[str] = Header(None)):
+def get_token(authorization: Optional[str] = Header(...)):
     if authorization is None:
         raise HTTPException(status_code=401, detail="Authorization header missing")
     
@@ -52,6 +55,6 @@ def get_current_user(token: str = Depends(get_token), db: Session = Depends(data
                                            detail="Could not validate Credentials",
                                            headers={"WWW-Authenticate": "Bearer"})
     token = verify_token_access(token, credendtials_exception)
-    user = db.query(models.User).filter(models.User.id == token.id).first()
-    return user
+    # user = db.query(models.User).filter(models.User.id == token.id).first()
+    return token.id
 

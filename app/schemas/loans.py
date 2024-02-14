@@ -1,13 +1,13 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
-from sql.models_alchemy import User, LoanType
+from sql.models_alchemy import User
 
+from schemas.all_models import LoanType
+from schemas.user import User
 class loanBase(BaseModel):
     '''maps a loan table'''
     __tablename__ = 'loans'
-    loan_id: int
-    user_id: int
     amount: int
     loan_type_id: int
    
@@ -15,7 +15,9 @@ class loanBase(BaseModel):
 class loanCreate(loanBase):
     pass
 
-class loan(loanBase):
+class Loan(loanBase):
+    loan_id: int
+    user_id: int
     status: Optional[str]
     application_date: datetime
     last_payment_date: Optional[datetime]

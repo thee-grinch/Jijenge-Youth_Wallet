@@ -7,14 +7,15 @@ from sql.database_alchemy import get_db, SessionLocal
 from utils.utils import hash_pass, verify_password
 from utils.user_verification import create_link, decode_token
 from utils.send_mail import send_mail
-from schemas.user import createUser
-from utils.oauth import create_access_token
+from utils.user_methods import user_dict
+import schemas.users
+from utils.oauth import create_access_token, get_current_user
 from schemas.schemas import *
 
 router = APIRouter()
 
 @router.post('/new/')
-def create_user(new_user: createUser , db: session = Depends(get_db)):
+def create_user(new_user: schemas.users.createUser , db: session = Depends(get_db)):
     """
         creates a new user to the database
         Parameters:
@@ -57,3 +58,8 @@ def login(userdetails: OAuth2PasswordRequestForm = Depends(), db: session = Depe
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"The passwords do not match")
     access_token = create_access_token(data={"user_id": user.id})
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get('/user')
+def dashboard(user_id: int = Depends(get_current_user), db: session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    return user_dict(user)

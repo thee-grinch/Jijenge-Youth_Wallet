@@ -20,6 +20,7 @@ class User(Base):
     contributions = relationship("Contribution", back_populates='user')
     loans = relationship("Loan", back_populates='user')
 
+
 class Administrator(Base):
     __tablename__ = 'administrators'
     admin_id = Column(Integer, primary_key=True, autoincrement=True)

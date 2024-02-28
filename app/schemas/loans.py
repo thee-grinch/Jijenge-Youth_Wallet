@@ -33,3 +33,5 @@ class Loan(loanBase):
     loan_type: Optional[loanType]
     user: Optional[User]
 
+class loan_pay(BaseModel):
+    amount: int

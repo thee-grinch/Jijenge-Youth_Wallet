@@ -12,6 +12,8 @@ def utilsLoan(Loan):
     @property
     def status(self):
         return self.status
+def verify_loan(loan: Loan):
+    loan.status = 'verified'
 
 def new_loan(loan: loanCreate, user_id: int, db: session):
     # new_loan.update({'user_id', user_id})
@@ -35,6 +37,7 @@ def calculate_amount(loan: Loan):
     'this function calculates loan amount'
     interest_rate = loan.loan_type.interest_rate / 100
     date_borrowed = loan.application_date
+    # total_amount = loan.total_amount
     delta = relativedelta(datetime.now(), date_borrowed)
     print(delta)
     months_borrowed = delta.years * 12 + delta.months or 1
@@ -45,4 +48,46 @@ def calculate_amount(loan: Loan):
     setattr(loan, 'total_amount', interest + amount_borrowed)
     return interest + amount_borrowed
 
+def set_balance(loan: Loan):
+    bal = loan.balance
+    if loan.status != 'paid':
+        total_amount = loan.total_amount
+        if loan.balance == 0:
+            setattr(loan, 'balance', total_amount)
+        else:
+            setattr(loan, 'balance', total_amount - bal)
+
+def calculate_amount_and_set_balance(loan: Loan):
+    interest_rate = loan.loan_type.interest_rate / 100
+    date_borrowed = loan.application_date
+    # total_amount = loan.total_amount
+    delta = relativedelta(datetime.now(), date_borrowed)
+    months_borrowed = delta.years * 12 + delta.months or 1
+    amount_borrowed = loan.amount
+    interest = interest_rate * months_borrowed * amount_borrowed
+    loan.total_amount = interest + amount_borrowed
+    loan.balance = loan.total_amount if loan.balance == 0 else loan.total_amount - loan.balance
+
+def pay_loan(loan: Loan, amount_paid: int):
+    if loan.status == 'paid':
+        raise ValueError('already paid')
+    if amount_paid <= 0:
+        raise ValueError('you cant pay zero amount')
+    total_paid = loan.total_paid
+    bal = loan.balance
+    if amount_paid > bal:
+        raise ValueError('amount greater than the loan balance')
+
+    total_amount = loan.total_amount
+
+    total_paid += amount_paid
+    bal = total_amount - total_paid
+    setattr(loan, 'balance', bal)
+    setattr(loan, 'total_paid', total_paid)
+    setattr(loan, 'last_payment_date', datetime.now())
+    return {'loan paid successfully'}
+
+def refresh(loan: Loan):
+    calculate_amount(loan)   
+    set_balance(loan)
     

@@ -8,7 +8,7 @@ serializer = URLSafeTimedSerializer(SECRET_KEY)
 def create_link(email: str):
     '''creates an email link for verification'''
     token = serializer.dumps(email)
-    url = 'http://localhost:8000/verify'
+    url = 'http://jijenge.muvandii.tech/verify'
     verification_link = '{}/?token={}'.format(url, token)
     return verification_link
 def decode_token(token: str):

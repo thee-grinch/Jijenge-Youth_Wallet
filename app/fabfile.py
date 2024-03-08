@@ -130,3 +130,9 @@ def nginx(c):
     conn = Connection(**conn_kwargs)
     conn.run('sudo apt update')
     conn.run('sudo apt install nginx')
+
+@task
+def update(c):
+    conn = Connection(**conn_kwargs)
+    conn.local('commit "update"')
+    conn.run('cd Jijenge-Youth_Wallet && git pull')

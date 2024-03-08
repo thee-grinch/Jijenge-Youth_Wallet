@@ -14,7 +14,7 @@ from schemas.schemas import *
 
 router = APIRouter()
 
-@router.post('/new/')
+@router.post('/app/new/')
 def create_user(new_user: schemas.users.createUser , db: session = Depends(get_db)):
     """
         creates a new user to the database
@@ -39,7 +39,7 @@ def create_user(new_user: schemas.users.createUser , db: session = Depends(get_d
     send_mail(new_user.email, link, new_user.first_name)
     return {'message': "{} was created successfully".format(new_user.first_name)}
 
-@router.get('/verify')
+@router.get('/app/verify')
 def verify_user(token: str, db: session = Depends(get_db)):
     email = decode_token(token)
     user = db.query(User).filter(User.email == email).first()
@@ -48,7 +48,7 @@ def verify_user(token: str, db: session = Depends(get_db)):
     db.commit()
     db.refresh(user)
 
-@router.post('/login', response_model=Token)
+@router.post('/app/login', response_model=Token)
 def login(userdetails: OAuth2PasswordRequestForm = Depends(), db: session = Depends(get_db)):
     user = db.query(User).filter(User.name == userdetails.username).first()
 
@@ -59,7 +59,7 @@ def login(userdetails: OAuth2PasswordRequestForm = Depends(), db: session = Depe
     access_token = create_access_token(data={"user_id": user.id})
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.get('/user')
+@router.get('/app/user')
 def dashboard(user_id: int = Depends(get_current_user), db: session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     return user_dict(user)

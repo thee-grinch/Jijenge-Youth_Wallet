@@ -2,7 +2,6 @@ alembic==1.13.1
 annotated-types==0.6.0
 anyio==3.7.1
 apispec==6.3.0
-apt-xapian-index
 asgiref==3.7.2
 bcrypt==3.2.2
 beautifulsoup4==4.12.2

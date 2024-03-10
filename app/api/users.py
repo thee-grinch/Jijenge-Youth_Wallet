@@ -48,6 +48,7 @@ def verify_user(token: str, db: session = Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
+    return {'message': 'user email was verified'}
 
 @router.post('/app/login', response_model=Token)
 def login(userdetails: OAuth2PasswordRequestForm = Depends(), db: session = Depends(get_db)):
@@ -59,6 +60,11 @@ def login(userdetails: OAuth2PasswordRequestForm = Depends(), db: session = Depe
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"The passwords do not match")
     access_token = create_access_token(data={"user_id": user.id})
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get('/app/username')
+def get_user(user_id: int = Depends(get_current_user), db: session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    return {'name': f"{user.first_name} {user.last_name}"}
 
 @router.get('/app/user')
 def dashboard(user_id: int = Depends(get_current_user), db: session = Depends(get_db)):

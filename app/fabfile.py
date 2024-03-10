@@ -121,7 +121,7 @@ def check(c):
 @task
 def run(c):
     conn = Connection(**conn_kwargs)
-    conn.run('cd Jijenge-Youth_Wallet && cd app && pip3 install -r requirements.txt && /home/ubuntu/.local/bin/uvicorn app:app')
+    conn.run('cd Jijenge-Youth_Wallet && cd app && pip3 install -r requirements.txt && /home/ubuntu/.local/bin/uvicorn app:app --reload')
     conn.run('sudo nginx -t')
     conn.run('sudo service nginx restart')
 
@@ -134,5 +134,10 @@ def nginx(c):
 @task
 def update(c):
     conn = Connection(**conn_kwargs)
-    conn.local('commit "update"')
+    conn.run('cd Jijenge-Youth_Wallet && git stash')
     conn.run('cd Jijenge-Youth_Wallet && git pull')
+
+@task
+def kill(c):
+    conn = Connection(**conn_kwargs)
+    conn.run('sudo pkill uvicorn')

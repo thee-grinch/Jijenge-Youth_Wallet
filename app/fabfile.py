@@ -121,7 +121,7 @@ def check(c):
 @task
 def run(c):
     conn = Connection(**conn_kwargs)
-    conn.run('cd Jijenge-Youth_Wallet && cd app && pip3 install -r requirements.txt && uvicorn app:app --reload')
+    conn.run('cd Jijenge-Youth_Wallet && cd app && pip3 install -r requirements.txt && /home/ubuntu/.local/bin/uvicorn app:app')
     conn.run('sudo nginx -t')
     conn.run('sudo service nginx restart')
 

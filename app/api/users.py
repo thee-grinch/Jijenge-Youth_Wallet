@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import session
+from sqlalchemy.sql import func
 
-from sql.models_alchemy import User
+from sql.models_alchemy import User, Loan, Contribution, Saving, Notification
 from sql.database_alchemy import get_db, SessionLocal
 from utils.utils import hash_pass, verify_password
 from utils.user_verification import create_link, decode_token
@@ -62,4 +63,11 @@ def login(userdetails: OAuth2PasswordRequestForm = Depends(), db: session = Depe
 @router.get('/app/user')
 def dashboard(user_id: int = Depends(get_current_user), db: session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
-    return user_dict(user)
+    total_loans = db.query(func.sum(Loan.amount)).scalar()
+    total_contributions = db.query(func.sum(Contribution.amount)).scalar()
+    total_savings = db.query(func.sum(Saving.amount)).scalar()
+    user_savings = db.query(func.sum(Saving.amount)).filter(Saving.user_id == user_id).scalar()
+    user_loans = db.query(func.sum(Loan.amount)).filter(Loan.user_id == user_id).scalar()
+    user_contributions = db.query(func.sum(Contribution.amount)).filter(Contribution.user_id == user_id).scalar()
+    notifications = db.query(Notification).filter(Notification.user_id == user_id).all()
+    return {'name': f"{user.first_name} {user.last_name}", 'group': {'savings': total_savings or 0, 'loans': total_loans or 0, 'contributions': total_contributions or 0}, 'user': {'savings': user_savings or 0, 'loans': user_loans or 0, 'contributions': user_contributions or 0}, 'notifications': notifications}

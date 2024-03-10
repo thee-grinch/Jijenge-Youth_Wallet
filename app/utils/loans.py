@@ -39,23 +39,24 @@ def calculate_amount(loan: Loan):
     date_borrowed = loan.application_date
     # total_amount = loan.total_amount
     delta = relativedelta(datetime.now(), date_borrowed)
-    print(delta)
+    # print(delta)
     months_borrowed = delta.years * 12 + delta.months or 1
-    print(months_borrowed)
+    # print(months_borrowed)
     amount_borrowed = loan.amount
     interest = interest_rate * months_borrowed * amount_borrowed
-    print(interest)
+    # print(interest)
     setattr(loan, 'total_amount', interest + amount_borrowed)
     return interest + amount_borrowed
 
 def set_balance(loan: Loan):
     bal = loan.balance
+    paid = loan.total_paid
     if loan.status != 'paid':
         total_amount = loan.total_amount
         if loan.balance == 0:
             setattr(loan, 'balance', total_amount)
         else:
-            setattr(loan, 'balance', total_amount - bal)
+            setattr(loan, 'balance', total_amount - paid)
 
 def calculate_amount_and_set_balance(loan: Loan):
     interest_rate = loan.loan_type.interest_rate / 100
@@ -87,7 +88,28 @@ def pay_loan(loan: Loan, amount_paid: int):
     setattr(loan, 'last_payment_date', datetime.now())
     return {'loan paid successfully'}
 
+def calculate_repayment_schedule(loan: Loan):
+    total_amount = loan.total_amount
+    repayment_period = loan.loan_type.repayment_period
+    print(repayment_period)
+    # end_date = loan.application_date + relativedelta(months=repayment_period)
+    date_elapsed = relativedelta(datetime.now(), loan.application_date).months
+    # print(date_elapsed)
+    remaining_months = repayment_period - date_elapsed
+    # print(remaining_months)
+    # remaining_months = relativedelta(end_date, datetime.now()).months or 1
+    setattr(loan, 'payment_schedule', total_amount / remaining_months)
+    return loan.payment_schedule
 def refresh(loan: Loan):
     calculate_amount(loan)   
     set_balance(loan)
-    
+    calculate_repayment_schedule(loan)
+    return loan
+
+def get_dict(loan: Loan):
+    next_payment_date = loan.last_payment_date + relativedelta(months=1) if loan.last_payment_date else loan.application_date + relativedelta(months=1)
+    number_of_days = (next_payment_date - datetime.now()).days
+
+    return {'next_payment_date': next_payment_date, 'number_of_days': number_of_days, 'loan_type': loan.loan_type.type_name, 'date_borrowed': loan.application_date,
+             'balance': loan.balance, 'total_amount': loan.total_amount, 'payment_schedule': loan.payment_schedule
+            }

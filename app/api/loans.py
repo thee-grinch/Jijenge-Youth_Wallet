@@ -11,7 +11,7 @@ from sql.models_alchemy import Loan
 from sql.database_alchemy import get_db
 from schemas import loans
 # from schemas.loans import Loan, loanCreate, loanType
-from utils.loans import new_loan, new_loanType, calculate_amount, refresh, pay_loan
+from utils.loans import new_loan, new_loanType, calculate_amount, refresh, pay_loan, get_dict
 router = APIRouter()
 
 @router.post('/app/new_loan')
@@ -34,15 +34,12 @@ def get_loan(user_id = Depends(get_current_user), db: session = Depends(get_db))
     
     if loan:
         my_return = {}
-        keys = ['status', 'application_date', 'last_payment_date', 'balance']
+        # keys = ['status', 'application_date', 'last_payment_date', 'balance', 'loan_type']
         refresh(loan)
         db.add(loan)
         db.commit()
         db.refresh(loan)
-        for key, value in loan.__dict__.items():
-            if key in keys:
-                my_return[key] = value
-        return my_return
+        return get_dict(loan)
     return {'message': 'No loans found'}
 
 @router.post('/app/pay_loan')

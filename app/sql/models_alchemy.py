@@ -19,7 +19,7 @@ class User(Base):
     savings = relationship("Saving", back_populates='user')
     contributions = relationship("Contribution", back_populates='user')
     loans = relationship("Loan", back_populates='user')
-
+    notifications = relationship("Notification", back_populates='user')
 
 class Administrator(Base):
     __tablename__ = 'administrators'
@@ -66,3 +66,13 @@ class Saving(Base):
     amount = Column(Integer)
     balance = Column(Integer)
     user = relationship("User", back_populates='savings')
+
+
+class Notification(Base):
+    __tablename__ = 'notifications'
+    notification_id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    title = Column(String)
+    message = Column(String)
+    date = Column(DateTime, default=datetime.utcnow)
+    user = relationship("User", back_populates='notifications')

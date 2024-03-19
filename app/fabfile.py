@@ -60,18 +60,27 @@ server {
     listen 80;
     listen [::]:80;
     server_name www.jijenge.muvandii.tech jijenge.muvandii.tech;
-    root /var/jijenge;
+    root /var/jijenge/dist;
     index index.html index.htm index.nginx-debian.html;
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
     location /app {
         proxy_pass http://localhost:8000;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
-
     }
 }
 '''
+@task
+def local(c):
+    local('sudo touch /etc/nginx/sites-available/jijenge')
+    local(f'echo "{my_server_block}" | sudo tee /etc/nginx/sites-available/jijenge')
+    local('sudo ln -sf /etc/nginx/sites-available/jijenge /etc/nginx/sites-enabled')
+    local('sudo nginx -t')
+    local('sudo service nginx reload')
 
 @task
 def recreate(c):
@@ -80,9 +89,9 @@ def recreate(c):
     # conn.run('sudo rm /etc/nginx/sites-available/jijenge')
     conn.run('sudo touch /etc/nginx/sites-available/jijenge')
     conn.run(f'echo "{my_server_block}" | sudo tee /etc/nginx/sites-available/jijenge')
-    conn.run('sudo ln -s /etc/nginx/sites-available/jijenge /etc/nginx/sites-enabled')
+    conn.run('sudo ln -sf /etc/nginx/sites-available/jijenge /etc/nginx/sites-enabled')
     conn.run('sudo nginx -t')
-    conn.run('sudo service nginx restart')
+    conn.run('sudo service nginx reload')
 
 @task
 def add(c):
@@ -141,3 +150,14 @@ def update(c):
 def kill(c):
     conn = Connection(**conn_kwargs)
     conn.run('sudo pkill uvicorn')
+
+@task
+def vueclone(c):
+    conn = Connection(**conn_kwargs)
+    conn.run(' sudo apt install -y npm')
+    result = conn.run('if [ -d "/path/to/folder" ]; then echo "Folder exists"; else echo "Folder does not exist"; fi')
+    result = conn.run('if ![ -d "~/jijenge-frontend" ]; then git clone https://github.com/thee-grinch/jijenge-frontend.git && cd jijenge-frontend && npm install && npm run build; else cd jijenge-frontend && git pull && npm install && npm run build; fi')
+    if result.failed:
+        conn.run('git -C jijenge-frontend pull && cd jijenge-frontend && npm install && npm run build')
+    else:
+        conn.run('cd jijenge-frontend && npm install && npm run build')

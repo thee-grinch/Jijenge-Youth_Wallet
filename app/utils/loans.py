@@ -1,11 +1,14 @@
-# from fastapi import Depends
+from fastapi import Depends
 from sqlalchemy.orm import session
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
 
-from sql.models_alchemy import Loan, LoanType
+from sql.models_alchemy import Loan, LoanType, User, Guarantors
 from schemas.loans import loanCreate, loanType
+# from utils.oauth import get_current_user
+from utils.totals import find_total
+from utils.transactions import new_transaction
 
 def utilsLoan(Loan):
     '''this class defines all methods for loan class'''
@@ -15,16 +18,41 @@ def utilsLoan(Loan):
 def verify_loan(loan: Loan):
     loan.status = 'verified'
 
-def new_loan(loan: loanCreate, user_id: int, db: session):
-    # new_loan.update({'user_id', user_id})
-    my_loan = {}
-    my_loan.update(loan)
-    my_loan['user_id'] = user_id
-    loan = Loan(**my_loan)
-    db.add(loan)
+def new_loan(loan_data: loanCreate, db, user_id):
+    new = {}
+    new.update(loan_data)
+    new.update({'user_id': user_id})
+    loan_type = db.query(LoanType).filter(LoanType.id == loan_data.loan_type_id).first()
+    user = db.query(User).filter(User.id == user_id).first()
+    if not loan_type:
+        raise ValueError('loan type does not exist')
+    if loan_type.guarantors:
+        if not loan_data.guarantors:
+            raise ValueError('guarantors are required')
+        elif len(loan_data.guarantors) < loan_type.guarantors:
+            raise ValueError('guarantors are not enough')
+        else:
+            for guarantor in loan_data.guarantors:
+                guarantor = db.query(User).filter(User.id == guarantor).first()
+                if not guarantor:
+                        raise ValueError('guarantor does not exist')
+                else:
+                    new_guarantor = Guarantors(user_id=guarantor.id, loan_id=loan_data.loan_id)
+                    db.add(new_guarantor)
+                    db.commit()
+    shares = user.shares.amount
+    max_loan =  shares * loan_type.multiplier
+    if loan_data.amount > max_loan:
+        raise ValueError('amount exceeds the maximum loan')
+    my_new_loan = Loan(**new)
+    db.add(my_new_loan)
     db.commit()
-    return {'message': 'loan created'}
+    find_total(db, loan_data.amount, 'loans')
+    # new_transaction(db, user_id, 'loan', loan_data.amount)
 
+    return {'message': 'loan was added successfully'}
+
+    
 def new_loanType(type_data: loanType, db: session):
     new = {}
     new.update(type_data)

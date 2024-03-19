@@ -9,6 +9,8 @@ class loanType(BaseModel):
     type_name: str
     interest_rate: float
     repayment_period: int
+    multiplier: int
+    guarantors: Optional[int]
 
 class loanBase(BaseModel):
     '''maps a loan table'''
@@ -19,6 +21,7 @@ class loanBase(BaseModel):
 
 class loanCreate(loanBase):
     application_date: Optional[datetime]
+    guarantors: Optional[list]
 
 class Loan(loanBase):
     loan_id: int

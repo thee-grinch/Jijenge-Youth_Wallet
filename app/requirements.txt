@@ -8,3 +8,4 @@ itsdangerous
 sqlalchemy
 pydantic[email]
 sqlmodel
+mysqlclient

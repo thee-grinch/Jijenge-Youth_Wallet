@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from sql.models_alchemy import Base
+
 sqlite_url = 'sqlite:///database.db'
 engine = create_engine(sqlite_url, pool_size=10, pool_recycle=3600)
 

@@ -12,6 +12,9 @@ from utils.user_methods import user_dict
 import schemas.users
 from utils.oauth import create_access_token, get_current_user
 from schemas.schemas import *
+from utils.totals import fetch_totals
+
+from input import add_user
 
 router = APIRouter()
 
@@ -76,4 +79,11 @@ def dashboard(user_id: int = Depends(get_current_user), db: session = Depends(ge
     user_loans = db.query(func.sum(Loan.amount)).filter(Loan.user_id == user_id).scalar()
     user_contributions = db.query(func.sum(Contribution.amount)).filter(Contribution.user_id == user_id).scalar()
     notifications = db.query(Notification).filter(Notification.user_id == user_id).all()
-    return {'name': f"{user.first_name} {user.last_name}", 'group': {'savings': total_savings or 0, 'loans': total_loans or 0, 'contributions': total_contributions or 0}, 'user': {'savings': user_savings or 0, 'loans': user_loans or 0, 'contributions': user_contributions or 0}, 'notifications': notifications}
+    data =fetch_totals(db)
+    return {'name': f"{user.first_name} {user.last_name}", 'group': data, 'user': {'savings': user_savings or 0, 'loans': user_loans or 0, 'contributions': user_contributions or 0}, 'notifications': notifications}
+
+@router.get('/app/fake_user')
+def add_fake_user(db: session = Depends(get_db)):
+    for i in range(3):
+        add_user(db)
+    return {'message': 'fake users added successfully'}

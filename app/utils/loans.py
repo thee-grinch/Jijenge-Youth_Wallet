@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
 
-from sql.models_alchemy import Loan, LoanType, User, Guarantors
+from sql.models_alchemy import Loan, LoanType, User, Guarantor
 from schemas.loans import loanCreate, loanType
 # from utils.oauth import get_current_user
 from utils.totals import find_total

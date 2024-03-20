@@ -20,9 +20,8 @@ class User(Base):
     contributions = relationship("Contribution", back_populates='user')
     loans = relationship("Loan", back_populates='user')
     notifications = relationship("Notification", back_populates='user')
-    shares = relationship("Shares", back_populates="user")
-    transactions = relationship("Transactions", back_populates="user")
-
+    shares = relationship("Share", back_populates="user")
+    transactions = relationship("Transaction", back_populates="user")
 class Administrator(Base):
     __tablename__ = 'administrators'
     admin_id = Column(Integer, primary_key=True, autoincrement=True)
@@ -60,7 +59,7 @@ class Loan(Base):
     total_amount = Column(Integer)
     loan_type = relationship("LoanType", back_populates='loans')
     user = relationship("User", back_populates='loans')
-    guarantors = relationship("Guarantors", back_populates='loan')
+    guarantors = relationship("Guarantor", back_populates='loan')
 
 #completed
 class Saving(Base):
@@ -81,7 +80,7 @@ class Notification(Base):
     date = Column(DateTime, default=datetime.now)
     user = relationship("User", back_populates='notifications')
 #completed
-class Guarantors(Base):
+class Guarantor(Base):
     __tablename__ = 'guarantors'
 
     guarantor_id = Column(Integer, primary_key=True, autoincrement=True)
@@ -89,21 +88,20 @@ class Guarantors(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     date = Column(DateTime, default=datetime.now)
 
-    loan = relationship("Loan")
-    user = relationship("User")
+    loan = relationship("Loan", back_populates='guarantors')
+    # user = relationship("User", back_populates='guarantors')
 
-class Shares(Base):
+class Share(Base):
     __tablename__ = 'shares'
 
     share_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     amount = Column(DECIMAL(10, 2))
     date = Column(DateTime, default=datetime.now)
-
-    user = relationship("User")
+    user = relationship("User", back_populates='shares')
 
 #implemented
-class Transactions(Base):
+class Transaction(Base):
     __tablename__ = 'transactions'
 
     transaction_id = Column(Integer, primary_key=True, autoincrement=True)
@@ -113,8 +111,8 @@ class Transactions(Base):
     date = Column(DateTime , default=datetime.now)
     money_in = Column(Boolean, default=True)
 
+    user = relationship("User", back_populates='transactions')
 
-    user = relationship("User")
 #implemented
 class Total(Base):
     __tablename__ = 'totals'

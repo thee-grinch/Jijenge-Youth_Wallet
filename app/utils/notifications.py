@@ -25,3 +25,13 @@ def new_notification(db, user_id, transaction_type, amount, guarantor=None, loan
     notification = Notification(user_id=user_id, title=title, message=message)
     db.add(notification)
     db.commit()
+
+# a function that gets the user's notifications
+def get_notifications(db, user_id):
+    notifications = db.query(Notification).filter(Notification.user_id == user_id).all()
+    if not notifications:
+        return {'message': 'no notifications found'}
+    data = []
+    for notification in notifications:
+        data.append({'title': notification.title, 'message': notification.message})
+    return data

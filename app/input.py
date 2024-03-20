@@ -21,14 +21,15 @@ def add_user(db: Session):
     db.refresh(user)
     # Generate dummy data for contributions, loans, savings, notifications, guarantors, shares, and transactions
     contribution = Contribution(user_id=user.id, amount=fake.random_int(min=1000, max=5000))
-    loan_type = LoanType(type_name="Personal Loan", interest_rate=5.0, repayment_period=12)
+    loan_type = LoanType(type_name=f"{fake.unique} loan", interest_rate=5.0, repayment_period=12)
     loan = Loan(user_id=user.id, amount=5000, loan_type=loan_type)
-    saving = Saving(user_id=user.id, amount=fake.random_int(min=1000, max=5000), balance=fake.random_int(min=1000, max=5000))
+    saving = Saving(user_id=user.id, amount=fake.random_int(min=1000, max=5000))
     notification = Notification(user_id=user.id, title="New Notification", message="You have a new notification")
-    guarantor = Guarantors(user_id=user.id, loan_id=loan.loan_id, date=datetime.now())
-    share = Shares(user_id=user.id, amount=fake.random_int(min=100, max=500))
-    transaction = Transactions(user_id=user.id, TransactionType="Deposit", Amount=fake.random_int(min=100, max=500))
+    guarantor = Guarantor(user_id=user.id, loan_id=loan.loan_id, date=datetime.now())
+    share = Share(user_id=user.id, amount=fake.random_int(min=100, max=500))
+    transaction = Transaction(user_id=user.id, type="Deposit", amount=fake.random_int(min=100, max=500))
     administrator = Administrator(user_id=user.id, title="Admin")
 
     db.add_all([contribution, loan_type, loan, saving, notification, guarantor, share, transaction, administrator])
     db.commit() 
+

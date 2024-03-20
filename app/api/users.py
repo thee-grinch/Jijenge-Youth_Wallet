@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import session
 from sqlalchemy.sql import func
 
-from sql.models_alchemy import User, Loan, Contribution, Saving, Notification
+from sql.models_alchemy import User, Loan, Contribution, Saving, Notification, Share
 from sql.database_alchemy import get_db, SessionLocal
 from utils.utils import hash_pass, verify_password
 from utils.user_verification import create_link, decode_token
@@ -13,7 +13,8 @@ import schemas.users
 from utils.oauth import create_access_token, get_current_user
 from schemas.schemas import *
 from utils.totals import fetch_totals
-
+from utils.notifications import get_notifications
+from utils.transactions import get_transactions
 from input import add_user
 
 router = APIRouter()
@@ -78,12 +79,14 @@ def dashboard(user_id: int = Depends(get_current_user), db: session = Depends(ge
     user_savings = db.query(func.sum(Saving.amount)).filter(Saving.user_id == user_id).scalar()
     user_loans = db.query(func.sum(Loan.amount)).filter(Loan.user_id == user_id).scalar()
     user_contributions = db.query(func.sum(Contribution.amount)).filter(Contribution.user_id == user_id).scalar()
-    notifications = db.query(Notification).filter(Notification.user_id == user_id).all()
-    data =fetch_totals(db)
-    return {'name': f"{user.first_name} {user.last_name}", 'group': data, 'user': {'savings': user_savings or 0, 'loans': user_loans or 0, 'contributions': user_contributions or 0}, 'notifications': notifications}
+    user_shares = db.query(func.sum(Share.amount)).filter(Share.user_id == user_id).scalar()
+    notifications = get_notifications(db, user_id)
+    transactions = get_transactions(db, user_id)
+    totals =fetch_totals(db)
+    return {'name': f"{user.first_name} {user.last_name}", 'group': totals, 'user': {'savings': user_savings or 0, 'loans': user_loans or 0, 'contributions': user_contributions or 0, 'shares': user_shares or 0}, 'notifications': notifications, 'transactions': transactions}
 
 @router.get('/app/fake_user')
 def add_fake_user(db: session = Depends(get_db)):
-    for i in range(3):
+    for i in range(10):
         add_user(db)
     return {'message': 'fake users added successfully'}

@@ -11,6 +11,7 @@ from sql.models_alchemy import Loan
 from sql.database_alchemy import get_db
 from schemas import loans
 from utils.transactions import new_transaction
+from utils.notifications import new_notification
 # from schemas.loans import Loan, loanCreate, loanType
 from utils.loans import new_loan, new_loanType, calculate_amount, refresh, pay_loan, get_dict
 router = APIRouter()
@@ -46,6 +47,8 @@ def get_loan(user_id = Depends(get_current_user), db: session = Depends(get_db))
 
 @router.post('/app/pay_loan')
 def repay(amount_paid: loans.loan_pay, user_id = Depends(get_current_user), db: session = Depends(get_db)):
+    new_notification(db, user_id, 'loan Payment', amount_paid.amount)
+    new_transaction(db, user_id, 'loan Payment', amount_paid.amount)
     loan = db.query(Loan).filter(Loan.user_id == user_id).first()
     if not loan:
         return {'message': 'user has no loans'}

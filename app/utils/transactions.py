@@ -3,7 +3,7 @@ from sql.models_alchemy import Transaction
 
 def new_transaction(db, user_id, transaction_type, amount):
     money_in = False if transaction_type == 'loan' else True
-    transaction = Transaction(user_id=user_id, TransactionType=transaction_type, Amount=amount, money_in=money_in)
+    transaction = Transaction(user_id=user_id, type=transaction_type, amount=amount, money_in=money_in)
     db.add(transaction)
     db.commit()
 

@@ -6,14 +6,18 @@ def find_total(db: Session, amount: int, col: str):
     today = datetime.datetime.now()
     month = today.strftime("%b")
     year = today.year
-    id = "{}-{}".format(month, year)
-    total = db.query(Total).filter(Total.id == id).first()
+    Id = "{}-{}".format(month, year)
+    total = db.query(Total).filter(Total.id == Id).first()
     if not total:
-        new_total = Total(id=id, col=amount)
+        total_dict = {
+            'id': Id,
+            col: amount
+        }
+        new_total = Total(**total_dict)
         db.add(new_total)
         db.commit()
     else:
-        total.col += amount
+        setattr(total, col, getattr(total, col, 0) + amount)
         db.commit()
 
 def fetch_totals(db: Session):

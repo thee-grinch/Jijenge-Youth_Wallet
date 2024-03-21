@@ -22,10 +22,22 @@ def new_loan(loan_data: loanCreate, db, user_id):
     new = {}
     new.update(loan_data)
     new.update({'user_id': user_id})
-    loan_type = db.query(LoanType).filter(LoanType.id == loan_data.loan_type_id).first()
+    loan_type = db.query(LoanType).filter(LoanType.loan_type_id == loan_data.loan_type_id).first()
     user = db.query(User).filter(User.id == user_id).first()
     if not loan_type:
         raise ValueError('loan type does not exist')
+    if not user:
+        raise ValueError('user does not exist')
+    shares = user.shares[0].amount
+    max_loan =  shares * loan_type.multiplier
+    if loan_data.amount > max_loan:
+        raise ValueError('amount exceeds the maximum loan')
+    
+    print(loan_data.__dict__)
+    new = Loan(**new)
+    db.add(new)
+    db.commit()
+    db.refresh(new)
     if loan_type.guarantors:
         if not loan_data.guarantors:
             raise ValueError('guarantors are required')
@@ -37,16 +49,16 @@ def new_loan(loan_data: loanCreate, db, user_id):
                 if not guarantor:
                         raise ValueError('guarantor does not exist')
                 else:
-                    new_guarantor = Guarantors(user_id=guarantor.id, loan_id=loan_data.loan_id)
+                    new_guarantor = Guarantor(user_id=guarantor.id, loan_id=my_new_loan.loan_id)
                     db.add(new_guarantor)
                     db.commit()
-    shares = user.shares.amount
-    max_loan =  shares * loan_type.multiplier
-    if loan_data.amount > max_loan:
-        raise ValueError('amount exceeds the maximum loan')
-    my_new_loan = Loan(**new)
-    db.add(my_new_loan)
-    db.commit()
+    # shares = user.shares.amount
+    # max_loan =  shares * loan_type.multiplier
+    # if loan_data.amount > max_loan:
+    #     raise ValueError('amount exceeds the maximum loan')
+    # my_new_loan = Loan(**new)
+    # db.add(my_new_loan)
+    # db.commit()
     find_total(db, loan_data.amount, 'loans')
     # new_transaction(db, user_id, 'loan', loan_data.amount)
 
@@ -137,6 +149,7 @@ def refresh(loan: Loan):
 def get_dict(loan: Loan):
     next_payment_date = loan.last_payment_date + relativedelta(months=1) if loan.last_payment_date else loan.application_date + relativedelta(months=1)
     number_of_days = (next_payment_date - datetime.now()).days
+
 
     return {'next_payment_date': next_payment_date, 'number_of_days': number_of_days, 'loan_type': loan.loan_type.type_name, 'date_borrowed': loan.application_date,
              'balance': loan.balance, 'total_amount': loan.total_amount, 'payment_schedule': loan.payment_schedule

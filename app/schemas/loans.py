@@ -14,14 +14,14 @@ class loanType(BaseModel):
 
 class loanBase(BaseModel):
     '''maps a loan table'''
-    __tablename__ = 'loans'
     amount: int
     loan_type_id: int
+    user_id: int
    
 
 class loanCreate(loanBase):
-    application_date: Optional[datetime]
-    guarantors: Optional[list]
+    # application_date: Optional[datetime]
+    guarantors: Optional[list[int]]
 
 class Loan(loanBase):
     loan_id: int
@@ -38,3 +38,4 @@ class Loan(loanBase):
 
 class loan_pay(BaseModel):
     amount: int
+    user_id: int

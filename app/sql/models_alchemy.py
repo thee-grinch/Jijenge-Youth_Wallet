@@ -42,6 +42,8 @@ class LoanType(Base):
     type_name = Column(String)
     interest_rate = Column(Float)
     repayment_period = Column(Integer)
+    multiplier = Column(Integer)
+    guarantors = Column(Integer)
     loans = relationship("Loan", back_populates='loan_type')
 #completed
 class Loan(Base):
@@ -52,11 +54,11 @@ class Loan(Base):
     loan_type_id = Column(Integer, ForeignKey('loantypes.loan_type_id'))
     status = Column(String, default='pending')
     application_date = Column(DateTime, default=datetime.now)
-    last_payment_date = Column(DateTime)
+    last_payment_date = Column(DateTime,)
     payment_schedule = Column(Integer)
     total_paid = Column(Integer, default=0)
     balance = Column(Integer, default=0)
-    total_amount = Column(Integer)
+    total_amount = Column(Integer, default=0)
     loan_type = relationship("LoanType", back_populates='loans')
     user = relationship("User", back_populates='loans')
     guarantors = relationship("Guarantor", back_populates='loan')

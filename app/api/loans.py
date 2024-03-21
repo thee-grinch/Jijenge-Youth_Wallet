@@ -27,9 +27,7 @@ def get_status(user_id = Depends(get_current_user), db: session = Depends(get_db
     calculate_amount(user.loans[0])
     return {'message': user.loans[0].total_amount}
 
-@router.post('/app/new_loan_type')
-def create_loanType(new_type: loans.loanType, db: session = Depends(get_db)):
-    return new_loanType(new_type, db)
+
 
 @router.get('/app/loans')
 def get_loan(user_id = Depends(get_current_user), db: session = Depends(get_db)):

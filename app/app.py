@@ -12,9 +12,7 @@ from sql.database_alchemy import create_db_and_tables, engine, get_db,Base
 # from utils.user_verification import create_link, decode_token
 # from utils.send_mail import send_mail
 from api import users
-from api import loans
-from api import shares
-from api import contributions
+from api import admin
 # from schemas import schemas
 # from sql.dbfunctions import create_user
 # routers = APIRouter(
@@ -23,9 +21,9 @@ from api import contributions
 Base.metadata.create_all(bind=engine)
 app = FastAPI()
 app.include_router(users.router)
-app.include_router(loans.router)
-app.include_router(shares.router)
-app.include_router(contributions.router)
+app.include_router(admin.router)
+# app.include_router(shares.router)
+# app.include_router(contributions.router)
 # app.include_router(savings.router)
 origins = [
     "http://localhost.tiangolo.com",

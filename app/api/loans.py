@@ -16,10 +16,10 @@ from utils.notifications import new_notification
 from utils.loans import new_loan, new_loanType, calculate_amount, refresh, pay_loan, get_dict
 router = APIRouter()
 
-@router.post('/app/new_loan')
-def create_loan(loan: loans.loanCreate, user_id = Depends(get_current_user), db: session = Depends(get_db)):
-    new_transaction(db, user_id, 'loan', loan.amount)
-    return new_loan(loan, user_id, db)
+# @router.post('/app/new_loan')
+# def create_loan(loan: loans.loanCreate, user_id = Depends(get_current_user), db: session = Depends(get_db)):
+#     new_transaction(db, user_id, 'loan', loan.amount)
+#     return new_loan(loan, user_id, db)
 
 @router.get('/app/loan_status')
 def get_status(user_id = Depends(get_current_user), db: session = Depends(get_db)):
@@ -43,12 +43,12 @@ def get_loan(user_id = Depends(get_current_user), db: session = Depends(get_db))
         return get_dict(loan)
     return {'message': 'No loans found'}
 
-@router.post('/app/pay_loan')
-def repay(amount_paid: loans.loan_pay, user_id = Depends(get_current_user), db: session = Depends(get_db)):
-    new_notification(db, user_id, 'loan Payment', amount_paid.amount)
-    new_transaction(db, user_id, 'loan Payment', amount_paid.amount)
-    loan = db.query(Loan).filter(Loan.user_id == user_id).first()
-    if not loan:
-        return {'message': 'user has no loans'}
-    new_transaction(db, user_id, 'loan Payment', amount_paid.amount)
-    return pay_loan(loan, amount_paid.amount)
+# @router.post('/app/pay_loan')
+# def repay(amount_paid: loans.loan_pay, user_id = Depends(get_current_user), db: session = Depends(get_db)):
+#     new_notification(db, user_id, 'loan Payment', amount_paid.amount)
+#     new_transaction(db, user_id, 'loan Payment', amount_paid.amount)
+#     loan = db.query(Loan).filter(Loan.user_id == user_id).first()
+#     if not loan:
+#         return {'message': 'user has no loans'}
+#     new_transaction(db, user_id, 'loan Payment', amount_paid.amount)
+#     return pay_loan(loan, amount_paid.amount)

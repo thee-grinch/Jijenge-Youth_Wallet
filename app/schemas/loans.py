@@ -19,8 +19,11 @@ class loanBase(BaseModel):
     user_id: int
    
 
-class loanCreate(loanBase):
+class loanCreate(BaseModel):
     # application_date: Optional[datetime]
+    amount: int
+    loan_type_id: int
+    user_id: int
     guarantors: Optional[list[int]]
 
 class Loan(loanBase):

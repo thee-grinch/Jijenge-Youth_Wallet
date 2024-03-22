@@ -49,11 +49,11 @@ def repay(loan_data: loans.loan_pay, admin_id: int = Depends(get_current_user), 
     if not loan:
         raise HTTPException(status_code=404, detail='Loan does not exist')
     new_transaction(db, loan_data.user_id, 'loan Payment', loan_data.amount)
-    new_notification(db, loan_data.user_id, 'loan Payment', loan_data.amount)
-    return pay_loan(loan, loan_data.amount)
+    new_notification(db, loan_data.user_id, 'payment', loan_data.amount)
+    return pay_loan(loan, loan_data.amount, db)
 
 @router.post('/app/add_shares')
-def new_share(share: shares.shareCreate, admin_id: int = Depends(get_current_user),  db: session = Depends(get_db)):
+def add_new_share(share: shares.shareCreate, admin_id: int = Depends(get_current_user),  db: session = Depends(get_db)):
     admin = db.query(Administrator).filter(Administrator.user_id == admin_id).first()
     if not admin:
         raise HTTPException(status_code=401, detail='You are not an admin')
@@ -61,8 +61,8 @@ def new_share(share: shares.shareCreate, admin_id: int = Depends(get_current_use
     new_notification(db, share.user_id, 'share', share.amount)
     return new_share(db, share.user_id, share.amount)
 
-@router.post('/app/new_contribution')
-def new_contribution(data: contributions.ContributionSchema, admin_id: int = Depends(get_current_user), db: session = Depends(get_db)):
+@router.post('/app/add_contribution')
+def add_new_contribution(data: contributions.ContributionSchema, admin_id: int = Depends(get_current_user), db: session = Depends(get_db)):
     admin = db.query(Administrator).filter(Administrator.user_id == admin_id).first()
     if not admin:
         raise HTTPException(status_code=401, detail='You are not an admin')

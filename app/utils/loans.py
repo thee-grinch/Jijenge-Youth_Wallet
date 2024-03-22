@@ -19,9 +19,12 @@ def verify_loan(loan: Loan):
     loan.status = 'verified'
 
 def new_loan(loan_data: loanCreate, db, user_id):
+    loan = db.query(Loan).filter(Loan.user_id == user_id).first()
+    if loan:
+        raise ValueError('user already has a loan')
     new = {}
     new.update(loan_data)
-    new.update({'user_id': user_id})
+    guarantors = new.pop('guarantors', None)
     loan_type = db.query(LoanType).filter(LoanType.loan_type_id == loan_data.loan_type_id).first()
     user = db.query(User).filter(User.id == user_id).first()
     if not loan_type:
@@ -33,7 +36,6 @@ def new_loan(loan_data: loanCreate, db, user_id):
     if loan_data.amount > max_loan:
         raise ValueError('amount exceeds the maximum loan')
     
-    print(loan_data.__dict__)
     new = Loan(**new)
     db.add(new)
     db.commit()
@@ -47,21 +49,12 @@ def new_loan(loan_data: loanCreate, db, user_id):
             for guarantor in loan_data.guarantors:
                 guarantor = db.query(User).filter(User.id == guarantor).first()
                 if not guarantor:
-                        raise ValueError('guarantor does not exist')
+                        raise ValueError('guarantor user does not exist')
                 else:
-                    new_guarantor = Guarantor(user_id=guarantor.id, loan_id=my_new_loan.loan_id)
+                    new_guarantor = Guarantor(user_id=guarantor.id, loan_id=new.loan_id)
                     db.add(new_guarantor)
                     db.commit()
-    # shares = user.shares.amount
-    # max_loan =  shares * loan_type.multiplier
-    # if loan_data.amount > max_loan:
-    #     raise ValueError('amount exceeds the maximum loan')
-    # my_new_loan = Loan(**new)
-    # db.add(my_new_loan)
-    # db.commit()
     find_total(db, loan_data.amount, 'loans')
-    # new_transaction(db, user_id, 'loan', loan_data.amount)
-
     return {'message': 'loan was added successfully'}
 
     
@@ -109,24 +102,6 @@ def calculate_amount_and_set_balance(loan: Loan):
     loan.total_amount = interest + amount_borrowed
     loan.balance = loan.total_amount if loan.balance == 0 else loan.total_amount - loan.balance
 
-def pay_loan(loan: Loan, amount_paid: int):
-    if loan.status == 'paid':
-        raise ValueError('already paid')
-    if amount_paid <= 0:
-        raise ValueError('you cant pay zero amount')
-    total_paid = loan.total_paid
-    bal = loan.balance
-    if amount_paid > bal:
-        raise ValueError('amount greater than the loan balance')
-
-    total_amount = loan.total_amount
-
-    total_paid += amount_paid
-    bal = total_amount - total_paid
-    setattr(loan, 'balance', bal)
-    setattr(loan, 'total_paid', total_paid)
-    setattr(loan, 'last_payment_date', datetime.now())
-    return {'loan paid successfully'}
 
 def calculate_repayment_schedule(loan: Loan):
     total_amount = loan.total_amount
@@ -145,6 +120,34 @@ def refresh(loan: Loan):
     set_balance(loan)
     calculate_repayment_schedule(loan)
     return loan
+def pay_loan(loan: Loan, amount_paid: int, db: session):
+    refresh(loan)
+    if loan.status == 'paid':
+        raise ValueError('already paid')
+    if amount_paid <= 0:
+        raise ValueError('you cant pay zero amount')
+    total_paid = loan.total_paid
+    print(total_paid, 'total paid')
+ 
+    bal = loan.balance
+    if amount_paid > bal:
+        raise ValueError('amount greater than the loan balance')
+
+    total_amount = loan.total_amount
+
+    total_paid += amount_paid
+    bal = total_amount - total_paid
+    setattr(loan, 'balance', bal)
+    setattr(loan, 'total_paid', total_paid)
+    setattr(loan, 'last_payment_date', datetime.now())
+    if bal == 0:
+        setattr(loan, 'status', 'paid')
+    db.add(loan)
+    db.commit()
+    db.refresh(loan)
+  
+    return {'loan paid successfully'}
+
 
 def get_dict(loan: Loan):
     next_payment_date = loan.last_payment_date + relativedelta(months=1) if loan.last_payment_date else loan.application_date + relativedelta(months=1)

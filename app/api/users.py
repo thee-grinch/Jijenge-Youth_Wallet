@@ -68,6 +68,10 @@ def login(userdetails: OAuth2PasswordRequestForm = Depends(), db: session = Depe
 @router.get('/app/username')
 def get_user(user_id: int = Depends(get_current_user), db: session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail='User does not exist')
+    if user.administrator.admin_id:
+        return {'name': f"{user.first_name} {user.last_name}", 'admin': True}
     return {'name': f"{user.first_name} {user.last_name}"}
 
 @router.get('/app/user')

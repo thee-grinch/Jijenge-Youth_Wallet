@@ -7,7 +7,7 @@ def new_contribution(db, user_id, amount):
     if not user:
         return {'message': 'user does not exist'}
     # transaction = Transaction(user_id=user_id, type='contribution', amount=amount)
-    contribution = contribution(user_id=user_id, amount=amount)
+    contribution = Contribution(user_id=user_id, amount=amount)
     # find_total(db, amount, 'contribution')
     db.add(contribution)
     db.commit()

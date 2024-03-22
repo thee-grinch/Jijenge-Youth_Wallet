@@ -22,11 +22,13 @@ class User(Base):
     notifications = relationship("Notification", back_populates='user')
     shares = relationship("Share", back_populates="user")
     transactions = relationship("Transaction", back_populates="user")
+    administrator = relationship("Administrator", uselist=False, back_populates='user')
 class Administrator(Base):
     __tablename__ = 'administrators'
     admin_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     title = Column(String)
+    user = relationship("User", back_populates='administrator')
 #completed
 class Contribution(Base):
     __tablename__ = 'contributions'

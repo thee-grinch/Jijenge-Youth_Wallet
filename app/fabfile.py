@@ -52,9 +52,9 @@ conn_kwargs = {
     "host": "18.207.142.2",
     "user": "ubuntu",
     "connect_kwargs": {
-        "key_filename": '/home/mordecai/.ssh/id_rsa',
+        # "key_filename": '/home/mordecai/.ssh/id_rsa',
         # "key_filename": 'C:\Users\Pappi\.ssh\id_rsa',
-        # "key_filename": 'C:\\Users\\Pappi\\.ssh\\id_rsa',
+        "key_filename": 'C:\\Users\\Pappi\\.ssh\\id_rsa',
     },
 }
 my_server_block = '''

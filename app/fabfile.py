@@ -49,7 +49,7 @@ page = '''
 
 '''
 conn_kwargs = {
-    "host": "18.207.142.2",
+    "host": "34.207.83.201",
     "user": "ubuntu",
     "connect_kwargs": {
         # "key_filename": '/home/mordecai/.ssh/id_rsa',

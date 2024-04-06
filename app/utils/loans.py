@@ -137,3 +137,8 @@ def get_dict(loan: Loan):
     return {'next_payment_date': next_payment_date, 'number_of_days': number_of_days, 'loan_type': loan.loan_type.type_name, 'date_borrowed': loan.application_date,
              'balance': loan.balance, 'total_amount': loan.total_amount, 'payment_schedule': loan.payment_schedule
             }
+
+def get_loan_types(db: session):
+    loan_types = db.query(LoanType).all()
+    loans = [type.type_name for type in loan_types]
+    return loans

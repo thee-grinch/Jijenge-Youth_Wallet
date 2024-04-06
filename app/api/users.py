@@ -15,6 +15,7 @@ from schemas.schemas import *
 from utils.totals import fetch_totals
 from utils.notifications import get_notifications
 from utils.transactions import get_transactions
+from utils.loans import get_loan_types, get_dict
 from input import add_user
 
 router = APIRouter()
@@ -80,6 +81,12 @@ def get_user(user_id: int = Depends(get_current_user), db: session = Depends(get
 @router.get('/app/user')
 def dashboard(user_id: int = Depends(get_current_user), db: session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
+    admin = False
+    try:
+        if user.administrator.admin_id:
+            admin = True
+    except:
+        pass
     total_loans = db.query(func.sum(Loan.amount)).scalar()
     total_contributions = db.query(func.sum(Contribution.amount)).scalar()
     total_savings = db.query(func.sum(Saving.amount)).scalar()
@@ -90,6 +97,14 @@ def dashboard(user_id: int = Depends(get_current_user), db: session = Depends(ge
     notifications = get_notifications(db, user_id)
     transactions = get_transactions(db, user_id)
     totals =fetch_totals(db)
+    user_response = {'name': f"{user.first_name} {user.last_name}", 'group': totals, 'user': {'savings': user_savings or 0, 'loans': user_loans or 0, 'contributions': user_contributions or 0, 'shares': user_shares or 0}, 'notifications': notifications, 'transactions': transactions}
+    loantypes = get_loan_types(db)
+    loan = db.query(Loan).filter(Loan.user_id == user_id).first()
+    if loan:
+        loan = get_dict(loan)
+    else:
+        loan = {}
+    
     return {'name': f"{user.first_name} {user.last_name}", 'group': totals, 'user': {'savings': user_savings or 0, 'loans': user_loans or 0, 'contributions': user_contributions or 0, 'shares': user_shares or 0}, 'notifications': notifications, 'transactions': transactions}
 
 @router.get('/app/fake_user')

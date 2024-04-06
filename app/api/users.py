@@ -105,7 +105,9 @@ def dashboard(user_id: int = Depends(get_current_user), db: session = Depends(ge
     else:
         loan = {}
     
-    return {'name': f"{user.first_name} {user.last_name}", 'group': totals, 'user': {'savings': user_savings or 0, 'loans': user_loans or 0, 'contributions': user_contributions or 0, 'shares': user_shares or 0}, 'notifications': notifications, 'transactions': transactions}
+    return {'user_response': user_response, 'loans': loan, 'loantypes': loantypes, 'admin': admin}
+    
+    # return {'name': f"{user.first_name} {user.last_name}", 'group': totals, 'user': {'savings': user_savings or 0, 'loans': user_loans or 0, 'contributions': user_contributions or 0, 'shares': user_shares or 0}, 'notifications': notifications, 'transactions': transactions}
 
 @router.get('/app/fake_user')
 def add_fake_user(db: session = Depends(get_db)):
